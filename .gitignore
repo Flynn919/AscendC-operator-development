@@ -1,0 +1,24 @@
+# Generated build artifacts
+AddKernelInvocationNeo/build/
+AddKernelInvocationNeo/out/
+
+# Simulator and diagnostic output
+AddKernelInvocationNeo/sim_log/
+AddKernelInvocationNeo/cceprint/
+AddKernelInvocationNeo/npuchk/
+*.log
+*.dump
+
+# Compiled objects and libraries
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+~$*.docx

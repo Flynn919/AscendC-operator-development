@@ -1,0 +1,71 @@
+========================================
+Ascend C 算子 CPU 调试使用说明（无 NPU 环境）
+========================================
+
+【环境说明】
+- CANN 安装路径：/home/li/Ascend/cann-9.2.0-beta.1
+- 本机无 NPU、无驱动（Driver: Not installed），只能做编译和模拟运行。
+- KernelLaunch 工程支持 3 种运行模式：
+    cpu  - CPU 模拟（验证核函数逻辑与数值正确性，推荐）
+    sim  - 指令级模拟（stub .so，验证指令级执行）
+    npu  - 真机运行（需 NPU + 驱动，本机不可用）
+- FrameworkLaunch/AclNNInvocation 走 ACL 运行时，必须真机，本机跑不了是正常的。
+
+========================================
+0. 加载 CANN 环境变量（每次新开终端先执行）
+========================================
+    source /home/li/Ascend/cann/set_env.sh
+
+========================================
+1. 桌面副本工程
+========================================
+    工程目录：/home/li/Desktop/AddKernelInvocationNeo
+    （从 samples-master 复制的 kernel 直调示例，已测试通过）
+
+========================================
+2. CPU 模拟运行（推荐，最快验证逻辑）
+========================================
+    cd /home/li/Desktop/AddKernelInvocationNeo
+    ./run.sh -r cpu -v Ascend310P3
+
+    预期输出：
+    [SUCCESS][CORE_0~7] exit success!
+    error ratio: 0.0000, tolerance: 0.0010
+    test pass
+
+========================================
+3. 指令级模拟运行（sim 模式，更接近真机）
+========================================
+    cd /home/li/Desktop/AddKernelInvocationNeo
+    ./run.sh -r sim -v Ascend910B3
+
+    预期输出：同为 test pass，并生成 sim_log/ 日志
+
+========================================
+4. run.sh 参数说明
+========================================
+    -r 运行模式：cpu / sim / npu
+    -v SOC 版本：Ascend910A Ascend910B Ascend310B1~B4
+                  Ascend310P1 Ascend310P3 Ascend910B1~B4
+
+========================================
+5. 若命令执行被沙箱拦截（Permission denied / hit restricted）
+========================================
+    原因：.run 安装器需要在 /home/li 下创建临时目录，
+          或 CANN 运行时写 /home/li/ascend/log 日志。
+    解决：在 Trae 设置 -> 权限与审批 -> 自定义配置 中
+          允许沙箱写入 /home/li/**，或运行时选择审批放行。
+
+========================================
+6. 常见问题
+========================================
+    Q: bash build.sh 报 No such file or directory?
+    A: build.sh 不在当前目录，需先 cd 到工程目录再执行。
+
+    Q: ModuleNotFoundError: No module named 'decorator'?
+    A: CANN tvm 工具链需要 decorator，执行：
+       pip install decorator
+
+    Q: AclNNInvocation 报 acl init failed?
+    A: 正常现象。该样例走 ACL 运行时，必须真实 NPU+驱动，
+       本机无设备时无法运行，请在有昇腾设备的机器上执行。
